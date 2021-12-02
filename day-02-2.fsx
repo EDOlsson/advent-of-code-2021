@@ -1,0 +1,57 @@
+let input = System.IO.File.ReadAllLines("./day-02-input")
+
+printfn "Read %d lines" <| input.Length
+
+type DirectionType =
+    | Forward
+    | Up
+    | Down
+
+type Instruction =
+    { Direction : DirectionType
+      Quantity : int64 }
+
+let parseInstruction (s : string) =
+    let parts = s.Split(' ')
+
+    let parseDirection (s : string) =
+        match s.ToUpper() with
+            | "FORWARD" -> Forward
+            | "DOWN" -> Down
+            | "UP" -> Up
+            | _ -> failwith <| sprintf "Unknown direction type %s" s
+
+    { Direction = (parseDirection parts.[0]); Quantity = (System.Convert.ToInt64(parts.[1])) }
+
+type Position =
+    { Horizontal : int64
+      Depth : int64
+      Aim : int64 }
+
+let processInstruction pos i =
+    match i with
+    | { Direction = Forward; Quantity = n } -> { pos with Horizontal = pos.Horizontal + n; Depth = pos.Depth + pos.Aim * n }
+    | { Direction = Up; Quantity = n } -> { pos with Aim = pos.Aim - n }
+    | { Direction = Down; Quantity = n } -> { pos with Aim = pos.Aim + n }
+
+let finalPosition = input
+                    |> Array.map parseInstruction
+                    |> Array.fold processInstruction { Horizontal = 0; Depth = 0; Aim = 0 }
+
+printfn "Final position :\r\n%A\tProduct : %d" finalPosition (finalPosition.Horizontal * finalPosition.Depth)
+
+let testInstructions = 
+    [|
+        "forward 5"
+        "down 5"
+        "forward 8"
+        "up 3"
+        "down 8"
+        "forward 2"
+    |]
+
+let testPosition = testInstructions
+                   |> Array.map parseInstruction
+                   |> Array.fold processInstruction { Horizontal = 0; Depth = 0; Aim = 0 }
+
+printfn "Final (test) position :\r\n%AProduct : %d" testPosition (testPosition.Horizontal * testPosition.Depth)
