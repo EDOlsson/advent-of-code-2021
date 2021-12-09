@@ -1,17 +1,6 @@
 let input = System.IO.File.ReadAllLines("./day-08-input")
 printfn "Read %d lines" input.Length
 
-let testInput = ("""be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
-edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
-fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
-fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
-aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea
-fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb
-dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
-bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
-egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
-gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce""").Split("\n")
-
 type Foo = {
     Inputs : string array
     Outputs: string array
@@ -152,8 +141,9 @@ let decodeDigit (model : SevenSegmentDisplay) (signals : string) =
         | n when n = nine -> 9
         | _ -> failwith (sprintf "unknown segments %A" s)
 
-    let segments = signals |> Seq.map (fun s -> findSegment model s)
-    decodeSegments segments
+    signals
+    |> Seq.map (fun s -> findSegment model s)
+    |> decodeSegments
 
 let createModelForInputs inputs =
     matchInputsWithKnownPatterns inputs
@@ -165,30 +155,6 @@ let convertDecodedDigitsToNumber digits =
     digits
     |> Array.fold (fun (multiplier, acc) d -> (multiplier / 10, acc + (d * multiplier))) (1000, 0)
     |> snd
-
-(*
-let singleTestPattern = "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"
-
-let sampleInputs = parseInput singleTestPattern
-
-let sampleX = createModelForInputs sampleInputs.Inputs
-
-let answer = sampleInputs.Outputs
-             |> Array.map (fun x -> decodeDigit sampleX x)
-             |> convertDecodedDigitsToNumber
-
-let models = testInput
-             |> Array.map parseInput
-             |> Array.map (fun f -> createModelForInputs f.Inputs)
-
-let answers = testInput
-              |> Array.map parseInput
-              |> Array.zip models
-              |> Array.map (fun (model, f) -> f.Outputs |> Array.map (fun o -> decodeDigit model o))
-              |> Array.map convertDecodedDigitsToNumber
-
-let sumOfAnswers = answers |> Array.sum
-*)
 
 let models = input
              |> Array.map parseInput
